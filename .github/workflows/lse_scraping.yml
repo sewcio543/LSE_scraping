@@ -32,7 +32,7 @@ jobs:
         run: python -m app.run --input ${{ env.INPUT_FILE }} --output ${{ env.OUTPUT_FOLDER }} --timestamp
 
       - name: Upload CSV artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.OUTPUT_FOLDER }}
