@@ -3,13 +3,19 @@ from pathlib import Path
 
 import pandas as pd
 
+import app.constants as const
 from app.models.pydantic_models import StockRequest
-from app.outut_saver import CSVSaver
+from app.output_saver import CSVSaver
 from app.reader import LSEDataReader
 from app.selenium_utils import get_driver
 
 
-def main(input_path: Path, output_folder: Path, include_timestamp: bool = True) -> None:
+def main(
+    input_path: Path,
+    output_folder: Path,
+    file_name: str,
+    include_timestamp: bool = True,
+) -> None:
     reader = LSEDataReader()
     data = reader.read(input_path)
 
@@ -20,7 +26,7 @@ def main(input_path: Path, output_folder: Path, include_timestamp: bool = True) 
 
     output = pd.DataFrame([s.model_dump() for s in responses])
 
-    saver = CSVSaver(include_timestamp=include_timestamp)
+    saver = CSVSaver(include_timestamp=include_timestamp, file_name=file_name)
     saver.save(output, output_folder)
 
 
@@ -35,6 +41,13 @@ if __name__ == "__main__":
         default=Path("output"),
     )
     parser.add_argument(
+        "--name",
+        type=str,
+        required=False,
+        help="Output file name",
+        default=const.OUTPUT_FILE_NAME,
+    )
+    parser.add_argument(
         "--timestamp",
         action="store_true",
         help="Include timestamp in output filename",
@@ -44,5 +57,6 @@ if __name__ == "__main__":
     main(
         input_path=args.input,
         output_folder=args.output,
+        file_name=args.name,
         include_timestamp=args.timestamp,
     )

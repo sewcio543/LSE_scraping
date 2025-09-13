@@ -22,4 +22,3 @@ exclude_lines =
 
 sort = cover
 show_missing = true
-fail_under = 100

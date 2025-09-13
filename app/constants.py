@@ -3,6 +3,7 @@ from pathlib import Path
 DATA_FOLDER = Path("data")
 
 OUTPUT_FILE_NAME = "lse_stocks"
+TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
 
 # scraping related constants
 PRICE_TAG_CLASS = "price-tag"
@@ -15,6 +16,7 @@ class LSEWebsite:
     BASE_URL = "https://www.londonstockexchange.com"
     STOCK_ENDPOINT = f"stock"
     PRICE_EXPLORER_URL = f"{BASE_URL}/live-markets/market-data-dashboard/price-explorer"
+    URL_SUFFIX = "company-page"
 
 
 class DataColumns:
