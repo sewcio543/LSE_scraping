@@ -1,0 +1,4 @@
+pydantic==2.11.8
+requests==2.32.5
+selenium==4.35.0
+soupsavvy==1.0.1

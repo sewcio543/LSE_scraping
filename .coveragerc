@@ -1,0 +1,25 @@
+[run]
+source = solution
+branch = True
+
+[report]
+omit =
+    *__init__.py
+    tests\*
+exclude_lines =
+    @overload
+    @abstract*
+    raise NotImplementedError
+    # Ignore imports
+    from
+    import
+    def __repr__
+    def __str__
+    pass
+    \.\.\.
+    deprecated
+    pragma: no cover
+
+sort = cover
+show_missing = true
+fail_under = 100

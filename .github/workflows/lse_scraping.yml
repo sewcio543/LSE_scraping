@@ -1,0 +1,38 @@
+name: LSE Scraper
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # every day at 09:00 UTC
+  workflow_dispatch:
+
+env:
+  INPUT_FILE: "data/LSE_input.csv"
+  OUTPUT_FOLDER: "output"
+  ARTIFACT_NAME: "lse_stocks"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python and Upgrade pip
+        uses: ./.github/actions/setup_python
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements_dev.txt
+
+      - name: Run scraper
+        run: python -m app.run --input ${{ env.INPUT_FILE }} --output ${{ env.OUTPUT_FOLDER }} --timestamp
+
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.OUTPUT_FOLDER }}
