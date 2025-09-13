@@ -20,13 +20,14 @@ def get_url(stock_info: StockRequest) -> str:
         const.LSEWebsite.STOCK_ENDPOINT,
         stock_info.stock_code,
         stock_info.company_name.lower().replace(" ", "-"),
-        "company-page",
+        const.LSEWebsite.URL_SUFFIX,
     ]
     return "/".join(url_parts)
 
 
 class LSEDriver(Chrome):
 
+    # TODO: exception handling to quit driver
     def scrape(self, requests: list[StockRequest]) -> list[StockResponse]:
         responses = []
 
