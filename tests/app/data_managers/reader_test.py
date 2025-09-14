@@ -21,7 +21,7 @@ stock_code_invalid_variation = DataColumns.STOCK_CODE.replace("_", "-")
 
 @pytest.fixture(
     params=[
-        # data wih columns with spaces and mixed case
+        # data with columns with spaces and mixed case
         pd.DataFrame(
             [
                 {
@@ -155,8 +155,9 @@ def valid_csv_file(request: FixtureRequest):
 )
 def invalid_csv_file(request: FixtureRequest):
     """
-    Fixture that writes a valid parametrized DataFrame to a CSV file.
-    This file should be read correctly by the LSEDataReader.
+    Fixture that writes an invalid parametrized DataFrame to a CSV file.
+    This file should NOT be read correctly by the LSEDataReader
+    and is intended to trigger errors.
     """
 
     os.makedirs(MOCK_INPUT_DIR, exist_ok=True)
