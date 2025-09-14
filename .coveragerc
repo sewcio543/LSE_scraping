@@ -6,7 +6,6 @@ branch = True
 omit =
     *__init__.py
     tests\*
-    app/run.py
     app/logging.py
 exclude_lines =
     @overload

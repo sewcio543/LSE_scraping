@@ -21,7 +21,7 @@ from app.data_managers.output_saver import CSVSaver
 from app.data_managers.parsers import parse_requests
 from app.data_managers.reader import LSEDataReader
 from app.logging import logger
-from app.models.pydantic_models import FailedStockResponse
+from app.models.pydantic_models import FailedStockResponse, StockResponse
 from app.scraping.selenium_utils import get_driver
 
 
@@ -41,7 +41,7 @@ def main(input_path: Path, output_path: Path) -> None:
     requests = parse_requests(data)
 
     driver = get_driver(headless=True)
-    responses = []
+    responses: list[StockResponse] = []
 
     for request in requests:
         try:
@@ -64,7 +64,7 @@ def main(input_path: Path, output_path: Path) -> None:
     logger.info(f"Output saved to {output_path}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description="Scrape LSE stock prices")
     parser.add_argument("--input", type=Path, required=True, help="Path to input CSV")
     parser.add_argument("--output", type=Path, required=False, help="Output file")

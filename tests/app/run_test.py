@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from typing import Any
 
 import numpy as np
@@ -106,3 +108,35 @@ class TestCLIIntegration:
 
         expected_df = pd.DataFrame(expected)
         pd.testing.assert_frame_equal(result, expected_df)
+
+    def test_main_integration_cli(
+        self,
+        tmp_path,
+        monkeypatch: MonkeyPatch,
+        mock_data: pd.DataFrame,
+    ):
+        """Tests if script run from command line works as expected."""
+        monkeypatch.setattr(cli, "get_driver", lambda headless=True: FakeDriver())
+
+        input_path = tmp_path / "input.csv"
+        output_path = tmp_path / "output.csv"
+
+        mock_data.to_csv(input_path, index=False)
+
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "app.run",
+                "--input",
+                str(input_path),
+                "--output",
+                str(output_path),
+            ],
+            check=True,
+        )
+
+        df_result = pd.read_csv(output_path)
+        expected_df = pd.DataFrame([STOCK_PARAMS, STOCK_PARAMS])
+
+        pd.testing.assert_frame_equal(df_result, expected_df, check_dtype=False)

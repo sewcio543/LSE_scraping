@@ -43,16 +43,38 @@ class StockResponse(BaseModel):
         Name of the company whose stock data was scraped.
     stock_code : str
         Stock code (ticker symbol) of the stock that was scraped.
-    timestamp : str
+    timestamp : str | None
         Timestamp indicated by LSE website when scraped stock value was last updated.
-    value : float
-        Scraped value of the stock.
+        If scraping failed, this will be None.
+    value : float | None
+        Scraped value of the stock. If scraping failed, this will be None.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     company_name: str
     stock_code: str
+    timestamp: str | None
+    value: float | None
+
+
+class SuccessfulStockResponse(StockResponse):
+    """
+    Model representing a successful response after scraping stock data.
+    Inherits from StockResponse and ensures that timestamp and value are not None.
+
+    Parameters
+    ----------
+    company_name : str
+        Name of the company whose stock data was scraped.
+    stock_code : str
+        Stock code (ticker symbol) of the stock that was scraped.
+    timestamp : str
+        Timestamp indicated by LSE website when scraped stock value was last updated.
+    value : float
+        Scraped value of the stock.
+    """
+
     timestamp: str
     value: float
 
@@ -78,5 +100,3 @@ class FailedStockResponse(StockResponse):
 
     timestamp: Literal[None] = None
     value: Literal[None] = None
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
