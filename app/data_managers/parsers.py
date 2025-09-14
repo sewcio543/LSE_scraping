@@ -56,6 +56,5 @@ def parse_url(stock_info: StockRequest) -> str:
         const.LSEWebsite.STOCK_ENDPOINT,
         stock_info.stock_code,
         stock_info.company_name.lower().replace(" ", "-"),
-        const.LSEWebsite.URL_SUFFIX,
     ]
     return "/".join(url_parts)

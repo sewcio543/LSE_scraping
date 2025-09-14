@@ -18,24 +18,10 @@ from soupsavvy.implementation.selenium import SeleniumElement
 import app.constants as const
 import app.exceptions as exc
 from app.data_managers.parsers import parse_url
-from app.logging import logger
 from app.models.pydantic_models import StockRequest, StockResponse
 from app.models.soupsavvy_models import StockScraperModel
 
-# driver options
-# TODO: extract maybe
-OPTIONS_ARGS = ["--disable-popup-blocking", "--disable-extensions", "--headless"]
-
-EXPERIMENTAL_OPTS = {
-    "excludeSwitches": ["enable-logging", "disable-popup-blocking"],
-}
-
-if platform == "linux":  # pragma: no cover
-    OPTIONS_ARGS += [
-        "--disable-dev-shm-usage",
-        "--no-sandbox",
-        "--user-data-dir=driver_logs",
-    ]
+page_loaded_condition = EC.presence_of_element_located((By.ID, const.STOCK_SCOPE_ID))
 
 
 class LSEDriver(Chrome):
@@ -45,20 +31,24 @@ class LSEDriver(Chrome):
     for navigating and extracting stock information.
     """
 
-    # TODO: exception handling to quit driver
-    def scrape(self, requests: list[StockRequest]) -> list[StockResponse]:
+    def scrape(self, request: StockRequest) -> StockResponse:
         """
-        Scrapes stock data for the given list of StockRequest objects.
+        Scrapes stock data for the given StockRequest object.
 
         Parameters
         ----------
-        requests : list[StockRequest]
-            List of StockRequest objects containing stock_code and company_name.
+        request : StockRequest
+            StockRequest object containing stock_code and company_name.
 
         Returns
         -------
-        list[StockResponse]
-            List of StockResponse objects with scraped data.
+        StockResponse
+            StockResponse object with scraped data.
+
+        Notes
+        -----
+        Method does not handle driver lifecycle (opening/closing).
+        Caller is responsible for managing the driver's lifecycle.
 
         Raises
         -------
@@ -67,47 +57,31 @@ class LSEDriver(Chrome):
         exc.ScrapingError
             If required elements cannot be found on the page.
         """
-        responses = []
+        url = parse_url(request)
+        self._navigate_to_stock_page(url)
+        element = self._get_element()
 
-        for request in requests:
-            url = parse_url(request)
+        try:
+            scraped = StockScraperModel.find(element)
+        except BaseModelException as e:
+            raise exc.ElementNotFoundError(f"Error scraping data for {url}: {e}") from e
 
-            try:
-                self._navigate_to_stock_page(url)
-            except exc.PageLoadError as e:
-                response = StockResponse(
-                    company_name=request.company_name,
-                    stock_code=request.stock_code,
-                    timestamp=None,
-                    value=None,
-                )
-                responses.append(response)
-                logger.error(f"Error loading page for {url}: {e} - no data retrieved")
-                continue
-
-            element = self._get_element()
-
-            try:
-                scraped = StockScraperModel.find(element)
-            except BaseModelException as e:
-                raise exc.ScrapingError(f"Error scraping data for {url}: {e}") from e
-
-            response = scraped.migrate(
-                StockResponse,
-                company_name=request.company_name,
-                stock_code=request.stock_code,
-            )
-            responses.append(response)
-
-        self.quit()
-        return responses
+        response = scraped.migrate(
+            StockResponse,
+            company_name=request.company_name,
+            stock_code=request.stock_code,
+        )
+        return response
 
     def _navigate_to_stock_page(self, url: str) -> Self:
         """
         Navigates to the stock details page for the given URL.
         Checks if the page loaded correctly and expected elements are present.
         """
-        self.get(url)
+        try:
+            self.get(url)
+        except Exception as e:  # network error, timeout, Chrome crash
+            raise exc.PageLoadError(f"Failed to load {url}: {e}") from e
 
         if not self._is_valid_stock_page():
             raise exc.PageLoadError(
@@ -131,15 +105,13 @@ class LSEDriver(Chrome):
         """
         return self.current_url != const.LSEWebsite.PRICE_EXPLORER_URL
 
-    def _wait_for_page_load(self, timeout: int = 10) -> Self:
+    def _wait_for_page_load(self, timeout: int = const.DEFAULT_TIMEOUT) -> Self:
         """
         Waits until the main stock data element is present on the page.
         If not found within the timeout, raises PageLoadError.
         """
         try:
-            WebDriverWait(self, timeout).until(
-                EC.presence_of_element_located((By.ID, const.STOCK_SCOPE_ID))
-            )
+            WebDriverWait(self, timeout).until(page_loaded_condition)
         except TimeoutException:
             raise exc.PageLoadError(
                 "Required web elements not found within the timeout period, "
@@ -148,20 +120,39 @@ class LSEDriver(Chrome):
         return self
 
 
-# TODO: clean up these options
-def get_driver() -> LSEDriver:
+def _build_chrome_options(headless: bool = True) -> Options:
+    """Build and return Chrome Options configured for LSE scraping."""
+
+    opts = Options()
+    args = const.CHROME_DEFAULT_ARGS
+
+    if headless:
+        args.append("--headless")
+
+    if platform == "linux":  # pragma: no cover
+        args.extend(const.CHROME_LINUX_ARGS)
+
+    for arg in args:
+        opts.add_argument(arg)
+
+    for key, value in const.CHROME_EXPERIMENTAL.items():
+        opts.add_experimental_option(key, value)
+
+    return opts
+
+
+def get_driver(headless: bool = True) -> LSEDriver:
     """
     Sets up and returns a configured LSEDriver instance.
+
+    Parameters
+    ----------
+    headless : bool, optional
+        Whether to run the browser in headless mode, by default True.
 
     Returns
     -------
     LSEDriver - Configured Selenium WebDriver for LSE scraping.
     """
-    opts = Options()
-
-    for arg in OPTIONS_ARGS:
-        opts.add_argument(arg)
-    for key, value in EXPERIMENTAL_OPTS.items():
-        opts.add_experimental_option(key, value)
-
+    opts = _build_chrome_options(headless=headless)
     return LSEDriver(options=opts)

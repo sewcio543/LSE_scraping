@@ -7,9 +7,8 @@ on:
 
 env:
   INPUT_FILE: "data/LSE_input.csv"
-  OUTPUT_FOLDER: "output"
+  OUTPUT_FILE: "output/lse_stocks.csv"
   ARTIFACT_NAME: "lse_stocks"
-  FILE_NAME: "lse_stocks"
 
 jobs:
   scrape:
@@ -29,10 +28,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run scraper
-        run: python -m app.run --input ${{ env.INPUT_FILE }} --output ${{ env.OUTPUT_FOLDER }} --timestamp
+        run: python -m app.run --input ${{ env.INPUT_FILE }} --output ${{ env.OUTPUT_FILE }}
 
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.OUTPUT_FOLDER }}/${{ env.FILE_NAME }}*.csv
+          path: ${{ env.OUTPUT_FILE }}

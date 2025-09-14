@@ -5,7 +5,9 @@ Used for data validation and serialization.
 Can be used for easy integration with API frameworks if needed.
 """
 
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict
 
 
 class StockRequest(BaseModel):
@@ -24,11 +26,12 @@ class StockRequest(BaseModel):
         Stock code (ticker symbol) of the company listed on LSE.
     """
 
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
     company_name: str
     stock_code: str
 
 
-# TODO: think what to do if request fails
 class StockResponse(BaseModel):
     """
     Model representing the response after scraping stock data.
@@ -40,14 +43,40 @@ class StockResponse(BaseModel):
         Name of the company whose stock data was scraped.
     stock_code : str
         Stock code (ticker symbol) of the stock that was scraped.
-    timestamp : str | None
+    timestamp : str
         Timestamp indicated by LSE website when scraped stock value was last updated.
-        None if scraping failed.
-    value : float | None
-        Scraped stock value. None if scraping failed.
+    value : float
+        Scraped value of the stock.
     """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     company_name: str
     stock_code: str
-    timestamp: str | None = None
-    value: float | None = None
+    timestamp: str
+    value: float
+
+
+class FailedStockResponse(StockResponse):
+    """
+    Model representing a failed response after attempting to scrape stock data.
+    Contains the original request data with None values for timestamp and value.
+
+    Parameters
+    ----------
+    company_name : str
+        Name of the company whose stock data was attempted to be scraped.
+    stock_code : str
+        Stock code (ticker symbol) of the stock that was attempted to be scraped.
+    timestamp : None
+        None indicating that the timestamp could not be retrieved
+        due to scraping failure.
+    value : None
+        None indicating that the stock value could not be retrieved
+        due to scraping failure.
+    """
+
+    timestamp: Literal[None] = None
+    value: Literal[None] = None
+
+    model_config = ConfigDict(extra="forbid", frozen=True)

@@ -2,7 +2,7 @@
 
 # saving related constants
 DEFAULT_OUTPUT_FOLDER = "output"
-DEFAULT_OUTPUT_FILE_NAME = "lse_stocks"
+DEFAULT_OUTPUT_BASE_NAME = "lse_stocks"
 TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
 
 # scraping related constants
@@ -10,6 +10,22 @@ PRICE_TAG_CLASS = "price-tag"
 STOCK_SCOPE_ID = "ticker"
 TIMESTAMP_ANCESTOR_CLASS = "delay"
 TIMESTAMP_TAG_TYPE = "span"
+
+# driver related constants
+CHROME_DEFAULT_ARGS = [
+    "--disable-popup-blocking",
+    "--disable-extensions",
+    "--disable-logging",
+    "--disable-gpu",
+    "--silent",
+]
+CHROME_LINUX_ARGS = [
+    "--disable-dev-shm-usage",
+    "--no-sandbox",
+    "--user-data-dir=driver_logs",
+]
+CHROME_EXPERIMENTAL = {"excludeSwitches": ["enable-logging", "disable-popup-blocking"]}
+DEFAULT_TIMEOUT = 10
 
 
 class LSEWebsite:
@@ -19,7 +35,6 @@ class LSEWebsite:
     STOCK_ENDPOINT = f"stock"
     # it's a page where LSE websites redirects when url for stock details is invalid
     PRICE_EXPLORER_URL = f"{BASE_URL}/live-markets/market-data-dashboard/price-explorer"
-    URL_SUFFIX = "company-page"
 
 
 class DataColumns:

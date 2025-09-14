@@ -14,3 +14,5 @@ coverage:
 	python -m coverage html
 typecheck:
 	python -m mypy . --ignore-missing-imports --no-incremental
+run:
+	python -m app.run --input data/LSE_input.csv

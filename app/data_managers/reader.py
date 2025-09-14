@@ -9,8 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from app.constants import DataColumns
-
-PathType = str | Path
+from app.types import PathType
 
 
 class IDataReader(ABC):
@@ -44,16 +43,8 @@ class LSEDataReader(IDataReader):
     """
 
     def read(self, path: PathType) -> pd.DataFrame:
-        new_cols = [
-            DataColumns.COMPANY_NAME,
-            DataColumns.STOCK_CODE,
-            DataColumns.TIMESTAMP,
-            DataColumns.VALUE,
-        ]
-        data = pd.read_csv(
-            path,
-            usecols=DataColumns.USE_COLUMNS,
-            names=new_cols,
-            header=0,
-        )
+        data = pd.read_csv(path)
+        columns = [col.replace(" ", "_").lower() for col in data.columns]
+        data.columns = columns
+        data = data[DataColumns.USE_COLUMNS]
         return data
