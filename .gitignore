@@ -8,6 +8,7 @@ __pycache__/
 test.ipynb
 test.py
 output
+tests/tmp
 
 # C extensions
 *.so

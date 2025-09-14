@@ -13,7 +13,14 @@ class ScrapingError(LSEError):
     """Raised when an error occurs during the scraping process."""
 
 
-class PageLoadError(LSEError):
+class ElementNotFoundError(ScrapingError):
+    """
+    Raised when a required HTML element is not found during scraping
+    or its processing failed.
+    """
+
+
+class PageLoadError(ScrapingError):
     """
     Raised when a web page fails to load properly for one of the reasons:
     - Stock url was invalid and driver was redirected

@@ -31,6 +31,10 @@ class StockScraperModel(BaseModel):
         | Operation(float)
     )
     timestamp = (
-        ClassSelector(consts.TIMESTAMP_ANCESTOR_CLASS)
-        >> TypeSelector(consts.TIMESTAMP_TAG_TYPE)
-    ) | Text()
+        (
+            ClassSelector(consts.TIMESTAMP_ANCESTOR_CLASS)
+            >> TypeSelector(consts.TIMESTAMP_TAG_TYPE)
+        )
+        | Text()
+        | Operation(str.strip)
+    )

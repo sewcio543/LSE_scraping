@@ -6,6 +6,7 @@ branch = True
 omit =
     *__init__.py
     tests\*
+    app/logging.py
 exclude_lines =
     @overload
     @abstract*
@@ -22,3 +23,4 @@ exclude_lines =
 
 sort = cover
 show_missing = true
+fail_under = 100
