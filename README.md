@@ -8,12 +8,12 @@ This tool automates the process: given a list of stocks it extracts their most r
 
 ## 🎯 Objective
 
-- Input: CSV file with stock `company-name` and `stock-code`
+- Input: CSV file with stock `company_name` and `stock_code` (names are case-insensitive, underscores and spaces are allowed).
 - Output: CSV file with the following columns:
   - `company-name`
   - `stock-code`
-  - `price`
   - `timestamp` (time from LSE, not script execution time)
+  - `value` (latest stock price)
 
 ## ✅ Requirements
 
@@ -57,7 +57,7 @@ pip install -r requirements_dev.txt
 2. Prepare valid input CSV file or use example provided in `data/LSE_input.csv`.
 
 ```csv
-company-name,stock-code
+company_name,stock_code
 Glencore plc,GLEN
 Xylion Devices,XD
 ```
@@ -71,8 +71,8 @@ python -m app.run --input {path_to_input_file} --output {path_to_output_file}
 4. Output
 
 ```csv
-company-name,stock-code,price,timestamp
-Glencore plc,GLEN,160.35,14.09.25 13:03:33 BST
+company_name,stock_code,timestamp,value
+Glencore plc,GLEN,14.09.25 13:03:33 BST,160.35
 Xylion Devices,XD,,
 ```
 
