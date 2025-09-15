@@ -1,10 +1,5 @@
 """Module containing constants used across the application."""
 
-# saving related constants
-DEFAULT_OUTPUT_FOLDER = "output"
-DEFAULT_OUTPUT_BASE_NAME = "lse_stocks"
-TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
-
 # scraping related constants
 PRICE_TAG_CLASS = "price-tag"
 STOCK_SCOPE_ID = "ticker"
