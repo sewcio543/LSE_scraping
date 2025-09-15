@@ -2,9 +2,9 @@
 
 ## 📌 Problem Description
 
-Investors or analysts otften need up-to-date stock prices from [London Stock Exchange](<https://www.londonstockexchange.com/>), doing it manually is time-consuming and error-prone.
+Investors or analysts often need up-to-date stock prices from [London Stock Exchange](<https://www.londonstockexchange.com/>), doing it manually is time-consuming and error-prone.
 
-This tool automates the process: given a list of stocks it extracts their most recent values from the exchange webite andsaves them in structured format.
+This tool automates the process: given a list of stocks it extracts their most recent values from the exchange website and saves them in structured format.
 
 ## 🎯 Objective
 
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 pip install -r requirements_dev.txt
 ```
 
-2. Prepare valid input CSV file or use example provided in `data/LSE_inut.csv`.
+2. Prepare valid input CSV file or use example provided in `data/LSE_input.csv`.
 
 ```csv
 company-name,stock-code
